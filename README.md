@@ -1,10 +1,13 @@
-Small library for building SQL query strings use PHP
+Small library for building SQL query strings
+============================================
 
-// query template, probably loaded from external file
-$template = "select emp.* from employee emp" .
-	" join departments dep on emp.id_department = dep.id" .
-	" @{where}" .
-	" @{order}" .
+####Samples
+<pre>
+// query template, probably loaded from external file 
+$template = "select emp.* from employee emp" . 
+	" join departments dep on emp.id_department = dep.id" . 
+	" @{where}" . 
+	" @{order}" . 
 	" limit :limit offset :offset";
 // create "where" clause
 $where = \Query\Expressions::where()
@@ -25,4 +28,5 @@ $sql = \Query\QueryBuilder::query($template)
 	->set("order", $order)
 	->build();
 
+</pre>
 参考：[java query-string-builder](https://github.com/alexkasko/query-string-builder).		
