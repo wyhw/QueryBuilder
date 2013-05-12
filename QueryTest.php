@@ -17,7 +17,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase {
 		$and1 = new \Query\AndExpr("abc", 'def');
 		$and2 = new \Query\AndExpr("abc", 'def');
 		$this->assertTrue($and1->equals($and2));
-		$this->assertFalse($and1->equals(new \Query\AndExpr('a', d)));
+		$this->assertFalse($and1->equals(new \Query\AndExpr('a', 'd')));
 		$exprList1 = new \Query\ExprList();
 		$exprList2 = new \Query\ExprList();
 		$exprList1->add($and1);
