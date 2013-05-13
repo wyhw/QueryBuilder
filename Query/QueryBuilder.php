@@ -24,7 +24,7 @@ class QueryBuilder {
 	const CLAUSE_PATTERN = '/[^@]@\{(\w+)\}/';
 
 	private $template;
-	private $clauses = array();
+	protected $clauses = array();
 
 	/**
 	 * Constructor

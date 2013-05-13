@@ -23,4 +23,16 @@ abstract class AbstractExpr implements \Query\Expression {
 	function equals($o) {
 		return serialize($this) === serialize($o);
 	}
+
+	function exprs() {
+		return array();
+	}
+
+	function replaceFieldName($oldName, $newName) {
+		foreach ($this->exprs() as $expr) {
+			if (($expr instanceof \Query\ComparisonExpr) || count($expr->exprs()) > 0) {
+				$expr->replaceFieldName($oldName, $newName);
+			}
+		}
+	}
 }

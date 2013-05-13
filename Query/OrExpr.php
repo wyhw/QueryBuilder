@@ -52,4 +52,8 @@ class OrExpr extends \Query\AbstractExpr {
 		return serialize($this->array) == serialize($o->array);
     }
 
+	function exprs() {
+		return $this->array;
+	}
+
 }

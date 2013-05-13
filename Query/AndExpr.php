@@ -48,4 +48,8 @@ class AndExpr extends \Query\AbstractExpr {
         return $this->left == $o->left && $this->right == $o->right;
     }
 
+	function exprs() {
+		return array($this->left, $this->right);
+	}
+
 }

@@ -16,7 +16,7 @@ namespace Query;
  */
 class PrefixExpr extends \Query\AbstractExpr {
 
-	private $prefix;
+	protected $prefix;
 	//Expression
 	private $body;
 
@@ -58,4 +58,9 @@ class PrefixExpr extends \Query\AbstractExpr {
 		if(is_null($o) || get_class() != get_class($o)) return false;
 		return ($this->prefix == $o->prefix) && (is_null($this->body) ? true : $this->body == $o->body);
     }
+
+	function exprs() {
+		if ($this->body instanceof \Query\AbstractExpr) return array($this->body);
+		return array();
+	}
 }

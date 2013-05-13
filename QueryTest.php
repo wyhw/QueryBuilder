@@ -66,4 +66,33 @@ STRBLOCK;
 
 		$this->assertEquals(str_replace("\n", "", $sqlResult), $sql);
 	}
+
+	function testMysqlQueryBuilder() {
+		$expr = \Query\Expressions::where()
+			->andExpr(new \Query\EqualExpr("surname", "surname"))
+			->andExpr(new \Query\LikeExpr("name", "name"))
+			->andExpr(
+				\Query\Expressions::orExpr(
+					\Query\Expressions::expr(new \Query\GreaterThanExpr("salary", "5000"))
+						->andExpr(new \Query\InExpr("position", "1,2,3"))
+						->andExpr(new \Query\InExpr("position", array(1,2.6,"3", "a"))),
+					\Query\Expressions::not(new \Query\GreaterThanExpr("age", "`ageThreshold`"))
+				)
+			)
+			->andExpr(new \Query\NotEqualExpr("status", "ARCHIVED"));
+
+		$columns = array(
+			"surname" => "prefix_surname",
+			"name" => "prefix_name",
+		);
+		$sql = \Query\MysqlQueryBuilder::query($expr, $columns)->build();
+		$sqlResult = <<<STRBLOCK
+where prefix_surname = 'surname'
+ and prefix_name like 'name'
+ and ((salary > 5000 and position in (1,2,3) and position in (1,2.6,3,'a')) or (not (age > `ageThreshold`)))
+ and status != 'ARCHIVED'
+STRBLOCK;
+
+		$this->assertEquals(str_replace("\n", "", $sqlResult), $sql);
+	}
 }
