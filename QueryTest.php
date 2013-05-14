@@ -95,4 +95,73 @@ STRBLOCK;
 
 		$this->assertEquals(str_replace("\n", "", $sqlResult), $sql);
 	}
+
+	function testOperatorExpr() {
+		$expr = \Query\Expressions::expr(new \Query\EqualExpr("surname", "myname"));
+		$dict = array();
+		$dict['surname'] = 'myname';
+
+		$this->assertEquals($expr->evaluate($dict), true);
+		$this->assertEquals("surname = 'myname'", "{$expr}");
+
+		$expr1 = $expr->andExpr(new \Query\EqualExpr("surname", "yourname"));
+		$this->assertEquals("surname = 'myname' and surname = 'yourname'", "{$expr1}");
+		$this->assertEquals($expr1->evaluate($dict), false);
+
+		$expr2 = $expr->andExpr(new \Query\NotEqualExpr("surname", "yourname"));
+		$this->assertEquals("surname = 'myname' and surname != 'yourname'", "{$expr2}");
+		$this->assertEquals($expr2->evaluate($dict), true);
+
+		$dict['salary'] = 6000;
+		$expr3 = $expr2->andExpr(new \Query\GreaterThanExpr("salary", "5000"));
+		$this->assertEquals("surname = 'myname' and surname != 'yourname' and salary > 5000", "{$expr3}");
+		$this->assertEquals($expr3->evaluate($dict), true);
+
+		$expr4 = $expr2->andExpr(new \Query\LessThanExpr("salary", "5000"));
+		$this->assertEquals("surname = 'myname' and surname != 'yourname' and salary < 5000", "{$expr4}");
+		$this->assertEquals($expr4->evaluate($dict), false);
+
+		$dict['position'] = 2;
+		$dict['age'] = 25;
+		$dict['ageThreshold'] = 45;
+		$expr5 = \Query\Expressions::expr(new \Query\EqualExpr("surname", "myname"))
+			->andExpr(new \Query\NotEqualExpr("surname", "yourname"))
+			->andExpr(new \Query\GreaterThanExpr("salary", "5000"))
+			->andExpr(new \Query\LessThanExpr("salary", "7000"))
+			->andExpr(new \Query\OrExpr(
+					new \Query\InExpr("position", "1,2,3"),
+					new \Query\NotExpr(
+						new \Query\InExpr("position", array(5, 6, 7))
+					)
+				)
+			)
+			->andExpr(\Query\Expressions::not(new \Query\GreaterThanExpr("age", "`ageThreshold`")));
+
+		$this->assertEquals("surname = 'myname' and surname != 'yourname' and salary > 5000 and salary < 7000 and ((position in (1,2,3)) or (not (position in (5,6,7)))) and not (age > `ageThreshold`)", "{$expr5}");
+		$this->assertEquals($expr5->evaluate($dict), true);
+
+		$dict['age'] = 50;
+		$this->assertEquals($expr5->evaluate($dict), false);
+
+		$dict['age'] = 30;
+		$dict['salary'] = 8000;
+		$this->assertEquals($expr5->evaluate($dict), false);
+
+		$dict['age'] = 30;
+		$dict['salary'] = 3000;
+		$this->assertEquals($expr5->evaluate($dict), false);
+
+		$dict['salary'] = 6000;
+		$this->assertEquals($expr5->evaluate($dict), true);
+
+		$dict['ageThreshold'] = 28;
+		$this->assertEquals($expr5->evaluate($dict), false);
+
+		$dict['age'] = 20;
+		$dict['position'] = 8;
+		$this->assertEquals($expr5->evaluate($dict), true);
+		$dict['position'] = 7;
+		$this->assertEquals($expr5->evaluate($dict), false);
+
+	}
 }

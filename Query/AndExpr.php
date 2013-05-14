@@ -11,7 +11,7 @@ namespace Query;
  * Conjunction expression
  *
  */
-class AndExpr extends \Query\AbstractExpr {
+class AndExpr extends \Query\LogicalExpr {
 
 	//Left Expression
 	private $left;
@@ -50,6 +50,11 @@ class AndExpr extends \Query\AbstractExpr {
 
 	function exprs() {
 		return array($this->left, $this->right);
+	}
+
+	function evaluate(array $dict)
+	{
+		return $this->left->evaluate($dict) && $this->right->evaluate($dict);
 	}
 
 }

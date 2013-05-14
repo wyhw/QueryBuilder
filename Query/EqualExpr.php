@@ -13,4 +13,19 @@ class EqualExpr extends \Query\ComparisonExpr
 	public function mid() {
 		return " = ";
 	}
+
+	function evaluate(array $dict) {
+		if ($this->left instanceof \Query\AbstractExpr) {
+			if ($this->right instanceof \Query\AbstractExpr) {
+				return $this->left->evaluate($dict) === $this->right->evaluate($dict);
+			} else {
+				return $this->left->evaluate($dict) === $this->right;
+			}
+		}
+		$left = $this->leftVal($dict);
+		if ($this->right instanceof \Query\AbstractExpr) {
+			return $left === $this->right->evaluate($dict);
+		}
+		return $left == $this->rightVal($dict);
+	}
 }

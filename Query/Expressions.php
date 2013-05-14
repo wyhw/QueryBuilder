@@ -57,6 +57,7 @@ final class Expressions {
 	 * @throws QueryBuilderException on empty input
 	 */
     public static function expr($expr) {
+		if ($expr instanceof \Query\AbstractExpr) return $expr;
 		return new \Query\LiteralExpr($expr);
 	}
 

@@ -12,7 +12,7 @@ namespace Query;
  * Negation expression implementation
  *
  */
-class NotExpr extends \Query\AbstractExpr {
+class NotExpr extends \Query\LogicalExpr {
 
 	//Expression
 	private $expr;
@@ -42,5 +42,13 @@ class NotExpr extends \Query\AbstractExpr {
 		if(is_null($o) || get_class() != get_class($o)) return false;
 		return $this->expr == $o->expr;
     }
+
+	function exprs() {
+		return array($this->expr);
+	}
+
+	function evaluate(array $dict) {
+		return !$this->expr->evaluate($dict);
+	}
 
 }

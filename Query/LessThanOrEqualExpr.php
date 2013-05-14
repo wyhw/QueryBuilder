@@ -13,4 +13,10 @@ class LessThanOrEqualExpr extends \Query\ComparisonExpr
 	public function mid() {
 		return " <= ";
 	}
+
+	function evaluate(array $dict) {
+		if (parent::evaluate($dict) === false) return false;
+		$left = $this->leftVal($dict);
+		return is_null($left) ? false : $left <= $this->rightVal($dict);
+	}
 }

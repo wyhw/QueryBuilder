@@ -2,7 +2,7 @@ Small library for building SQL query strings
 ============================================
 
 ####Samples
-<pre>
+````
 // query template, probably loaded from external file 
 $template = "select emp.* from employee emp" . 
 	" join departments dep on emp.id_department = dep.id" . 
@@ -57,7 +57,41 @@ where prefix_surname = 'surname'
  and status != 'ARCHIVED'
 STRBLOCK;
 
+//operator : evaluate
+$expr = \Query\Expressions::expr(new \Query\EqualExpr("surname", "myname"));
+$dict = array();
+$dict['surname'] = 'myname';
+$expr->evaluate($dict);
+
+$expr1 = $expr->andExpr(new \Query\EqualExpr("surname", "yourname"));
+$expr->evaluate($dict);
+$expr2 = $expr->andExpr(new \Query\NotEqualExpr("surname", "yourname"));
+$expr2->evaluate($dict);
+$dict['salary'] = 6000;
+$expr3 = $expr2->andExpr(new \Query\GreaterThanExpr("salary", "5000"));
+$expr3->evaluate($dict);
+$expr4 = $expr2->andExpr(new \Query\LessThanExpr("salary", "5000"));
+$expr4->evaluate($dict);
+
+$dict['position'] = 2;
+$dict['age'] = 25;
+$dict['ageThreshold'] = 45;
+
+$expr5 = \Query\Expressions::expr(new \Query\EqualExpr("surname", "myname"))
+	->andExpr(new \Query\NotEqualExpr("surname", "yourname"))
+	->andExpr(new \Query\GreaterThanExpr("salary", "5000"))
+	->andExpr(new \Query\LessThanExpr("salary", "7000"))
+	->andExpr(new \Query\OrExpr(
+			new \Query\InExpr("position", "1,2,3"),
+			new \Query\NotExpr(
+				new \Query\InExpr("position", array(5, 6, 7))
+			)
+		)
+	)
+	->andExpr(\Query\Expressions::not(new \Query\GreaterThanExpr("age", "`ageThreshold`")));
+$expr5->evaluate($dict);
+
 请参见测试用例：QueryTest.php
 
-</pre>
+````
 参考：[java query-string-builder](https://github.com/alexkasko/query-string-builder).		

@@ -27,4 +27,17 @@ class InExpr extends \Query\ComparisonExpr
 		}
 		return $this->left . $this->mid() . $this->right . ")" ;
 	}
+
+	function evaluate(array $dict) {
+		$right = $this->right;
+		if (!is_array($right)) $right = explode(",", $right);
+
+		if (count($right) == 0) return false;
+		$left = $this->leftVal($dict);
+		foreach ($right as $r) {
+			if (is_string($r)) $r = trim($r);
+			if ($left == $r) return true;
+		}
+		return false;
+	}
 }

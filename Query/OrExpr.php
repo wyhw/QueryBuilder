@@ -13,7 +13,7 @@ namespace Query;
  * Disjunction expression implementation
  *
  */
-class OrExpr extends \Query\AbstractExpr {
+class OrExpr extends \Query\LogicalExpr {
 
 	//Expression
 	private $array = array();
@@ -23,9 +23,17 @@ class OrExpr extends \Query\AbstractExpr {
 	 *
 	 * @param array array of disjunctions
 	 */
-	function __construct($array) {
-		if (is_null($array)) throw new \Query\QueryBuilderException("Provided expressions array is null");
-		$this->array = $array;
+	function __construct() {
+		$exprs = array();
+		foreach (func_get_args() as $expr) {
+			if (is_array($expr)) {
+				$exprs = array_merge($exprs, $expr);
+				continue;
+			}
+			if (!($expr instanceof \Query\Expression)) continue;
+			$exprs[] = $expr;
+		}
+		$this->array = $exprs;
 	}
 
 	/**
@@ -54,6 +62,14 @@ class OrExpr extends \Query\AbstractExpr {
 
 	function exprs() {
 		return $this->array;
+	}
+
+	function evaluate(array $dict)
+	{
+		foreach($this->array as $e) {
+			if ($e->evaluate($dict)) return true;
+		}
+		return false;
 	}
 
 }

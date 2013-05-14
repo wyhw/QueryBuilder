@@ -20,6 +20,16 @@ abstract class AbstractExpr implements \Query\Expression {
 		return new AndExpr($this, $expr);
 	}
 
+	/**
+	 * Adds another expression to this expression as a conjunction
+	 *
+	 * @param $dict. such as array('key1' => 'val1', 'key2' => 'val2');
+	 * @return Expression
+	 */
+	function evaluate(array $dict) {
+		return true;
+	}
+
 	function equals($o) {
 		return serialize($this) === serialize($o);
 	}

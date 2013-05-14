@@ -16,8 +16,8 @@ abstract class ComparisonExpr extends \Query\AbstractExpr
 	/**
 	 * Comparison Operator constructor.
 	 *
-	 * @param Variable $left  Left side of comparison
-	 * @param Variable $right Right side of comparison
+	 * @param $left  Left side of comparison
+	 * @param $right Right side of comparison
 	 */
 	public function __construct($left, $right)
 	{
@@ -32,13 +32,17 @@ abstract class ComparisonExpr extends \Query\AbstractExpr
 	}
 
 	public function __toString() {
+		$mid = $this->mid();
+		if ($this->left instanceof \Query\AbstractExpr || $this->right instanceof \Query\AbstractExpr) {
+				$mid = " ";
+		}
 		$right = $this->right;
 		if (!is_numeric($right)) {
-			if (!($right[0] == "`" && $right[strlen($right) - 1] == "`")) {
+			if (!$this->isMysqlField($right)) {
 				$right = "'{$right}'";
 			}
 		}
-		return $this->left . $this->mid() . $right ;
+		return $this->left . $mid . $right ;
 	}
 
 	function equals($o) {
@@ -50,4 +54,31 @@ abstract class ComparisonExpr extends \Query\AbstractExpr
 	function replaceFieldName($oldName, $newName) {
 		if ($oldName == $this->left) $this->left = $newName;
 	}
+
+	function evaluate(array $dict) {
+		if ($this->left instanceof \Query\AbstractExpr || $this->right instanceof \Query\AbstractExpr) {
+			return false;
+		}
+		return true;
+	}
+
+	protected function leftVal($dict) {
+		if (!isset($dict["{$this->left}"])) return null;
+		return $dict["{$this->left}"];
+	}
+
+	protected function rightVal($dict) {
+		if (!is_numeric($this->right)) {
+			if ($this->isMysqlField($this->right)) {
+				$right = substr($this->right, 1, strlen($this->right) - 2);
+				if (!empty($right) && isset($dict[$right])) return $dict[$right];
+			}
+		}
+		return $this->right;
+	}
+
+	private function isMysqlField($val) {
+		return ($val[0] == "`" && $val[strlen($val) - 1] == "`");
+	}
+
 }
