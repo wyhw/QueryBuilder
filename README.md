@@ -11,22 +11,22 @@ $template = "select emp.* from employee emp" .
 	" limit :limit offset :offset";
 // create "where" clause
 $where = \Query\Expressions::where()
-	-&gt;andExpr("emp.surname = :surname")
-	-&gt;andExpr("emp.name like :name")
-	-&gt;andExpr(
+	->andExpr("emp.surname = :surname")
+	->andExpr("emp.name like :name")
+	->andExpr(
 		\Query\Expressions::orExpr(
-			\Query\Expressions::expr("emp.salary &lt; :salary")-&gt;andExpr("emp.position in (:positionList)"),
-			\Query\Expressions::not("emp.age &lt; :ageThreshold")
+			\Query\Expressions::expr("emp.salary < :salary")->andExpr("emp.position in (:positionList)"),
+			\Query\Expressions::not("emp.age < :ageThreshold")
 		)
 	)
-	-&gt;andExpr("status != 'ARCHIVED'");
+	->andExpr("status != 'ARCHIVED'");
 // create "order" clause
-$order = \Query\Expressions::orderBy()-&gt;add("dep.id desc")-&gt;add("cust.salary");
+$order = \Query\Expressions::orderBy()->add("dep.id desc")->add("cust.salary");
 // create builder from template and fill clauses
 $sql = \Query\QueryBuilder::query($template)
-	-&gt;set("where", $where)
-	-&gt;set("order", $order)
-	-&gt;build();
+	->set("where", $where)
+	->set("order", $order)
+	->build();
 	
 	
 
@@ -49,11 +49,11 @@ $expr = \Query\Expressions::where()
 			"surname" => "prefix_surname",
 			"name" => "prefix_name",
 		);
-		$sql = \Query\MysqlQueryBuilder::query($expr, $columns)-&gt;build();
-		$sqlResult = &gt;&gt;&gt;STRBLOCK
+		$sql = \Query\MysqlQueryBuilder::query($expr, $columns)->build();
+		$sqlResult = >>>STRBLOCK
 where prefix_surname = 'surname'
  and prefix_name like 'name'
- and ((salary &lt; 5000 and position in (1,2,3) and position in (1,2.6,3,'a')) or (not (age &gt; `ageThreshold`)))
+ and ((salary < 5000 and position in (1,2,3) and position in (1,2.6,3,'a')) or (not (age > `ageThreshold`)))
  and status != 'ARCHIVED'
 STRBLOCK;
 
