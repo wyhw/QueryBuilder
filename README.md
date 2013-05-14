@@ -91,7 +91,7 @@ $expr5 = \Query\Expressions::expr(new \Query\EqualExpr("surname", "myname"))
 	->andExpr(\Query\Expressions::not(new \Query\GreaterThanExpr("age", "`ageThreshold`")));
 $expr5->evaluate($dict);
 
-请参见测试用例：QueryTest.php
-
 ````
+请参见测试用例：[QueryTest.php](https://github.com/wyhw/QueryBuilder/blob/master/QueryTest.php)
+
 参考：[java query-string-builder](https://github.com/alexkasko/query-string-builder).		
